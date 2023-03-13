@@ -13,14 +13,14 @@ int init(void)
 	mqd_t q_server;   // Cola del servidor
 	mqd_t q_client;   // Cola del cliente
 	
-	Request req;
-	Response res;       
+	request_t req;
+	response_t res;       
 
 	struct mq_attr attr;
 	char queuename[MAX_SIZE];
 
    	attr.mq_maxmsg = 1;  
-	attr.mq_msgsize = sizeof(Response);
+	attr.mq_msgsize = sizeof(response_t);
 
 	q_server = mq_open("/SERVER", O_WRONLY);
 	if (q_server == -1){
@@ -43,7 +43,7 @@ int init(void)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}	
@@ -58,14 +58,14 @@ int set_value(int key, char *value1, int value2, double value3)
 	mqd_t q_server;   // Cola del servidor
 	mqd_t q_client;   // Cola del cliente
 	
-	Request req;
-	Response res;       
+	request_t req;
+	response_t res;       
 
 	struct mq_attr attr;
 	char queuename[MAX_SIZE];
 
    	attr.mq_maxmsg = 1;  
-	attr.mq_msgsize = sizeof(Response);
+	attr.mq_msgsize = sizeof(response_t);
 
 	q_server = mq_open("/SERVER", O_WRONLY);
 	if (q_server == -1){
@@ -93,7 +93,7 @@ int set_value(int key, char *value1, int value2, double value3)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}	
@@ -108,14 +108,14 @@ int get_value(int key, char *value1, int *value2, double *value3)
 	mqd_t q_server;   // Cola del servidor
 	mqd_t q_client;   // Cola del cliente
 	
-	Request req;
-	Response res;       
+	request_t req;
+	response_t res;       
 
 	struct mq_attr attr;
 	char queuename[MAX_SIZE];
    
 	attr.mq_maxmsg = 1;     
-	attr.mq_msgsize = sizeof(Response);
+	attr.mq_msgsize = sizeof(response_t);
 
 	q_server = mq_open("/SERVER", O_WRONLY);
 	if (q_server == -1){
@@ -141,7 +141,7 @@ int get_value(int key, char *value1, int *value2, double *value3)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}	
@@ -163,14 +163,14 @@ int modify_value(int key, char *value1, int value2, double value3)
 	mqd_t q_server;   // Cola del servidor
 	mqd_t q_client;   // Cola del cliente
 	
-	Request req;
-	Response res;       
+	request_t req;
+	response_t res;       
 
 	struct mq_attr attr;
 	char queuename[MAX_SIZE];
    
    	attr.mq_maxmsg = 1;  
-	attr.mq_msgsize = sizeof(Response);
+	attr.mq_msgsize = sizeof(response_t);
 
 	q_server = mq_open("/SERVER", O_WRONLY);
 	if (q_server == -1){
@@ -199,7 +199,7 @@ int modify_value(int key, char *value1, int value2, double value3)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}
@@ -215,14 +215,14 @@ int delete_key(int key)
 	mqd_t q_server;   // Cola del servidor
 	mqd_t q_client;   // Cola del cliente
 	
-	Request req;
-	Response res;       
+	request_t req;
+	response_t res;       
 
 	struct mq_attr attr;
 	char queuename[MAX_SIZE];
    
    	attr.mq_maxmsg = 1;  
-	attr.mq_msgsize = sizeof(Response);
+	attr.mq_msgsize = sizeof(response_t);
 
 	q_server = mq_open("/SERVER", O_WRONLY);
 	if (q_server == -1){
@@ -247,7 +247,7 @@ int delete_key(int key)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}	
@@ -263,14 +263,14 @@ int exist(int key)
 	mqd_t q_server;   // Cola del servidor
 	mqd_t q_client;   // Cola del cliente
 	
-	Request req;
-	Response res;       
+	request_t req;
+	response_t res;       
 
 	struct mq_attr attr;
 	char queuename[MAX_SIZE];
    
    	attr.mq_maxmsg = 1;  
-	attr.mq_msgsize = sizeof(Response);
+	attr.mq_msgsize = sizeof(response_t);
 
 	q_server = mq_open("/SERVER", O_WRONLY);
 	if (q_server == -1){
@@ -295,7 +295,7 @@ int exist(int key)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}	
@@ -311,15 +311,15 @@ int copy_key(int key1, int key2)
 	mqd_t q_server;   // Cola del servidor
 	mqd_t q_client;   // Cola del cliente
 	
-	Request req; 
+	request_t req; 
 
-	Response res;       
+	response_t res;       
 
 	struct mq_attr attr;
 	char queuename[MAX_SIZE];
    
    	attr.mq_maxmsg = 1;  
-	attr.mq_msgsize = sizeof(Response);
+	attr.mq_msgsize = sizeof(response_t);
 
 	q_server = mq_open("/SERVER", O_WRONLY);
 	if (q_server == -1){
@@ -344,7 +344,7 @@ int copy_key(int key1, int key2)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}	
@@ -365,7 +365,7 @@ int copy_key(int key1, int key2)
 		perror("mq_send");
 		return (-1);
 	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(Response), 0) < 0){
+    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
 		perror("mq_recv");
 		return (-1);
 	}	

@@ -152,12 +152,12 @@ int exist(int key){
 
 /* Función llamada para tratar las peticiones recibidas */
 void tratar_peticion(void *req){
-	Request request;
-	Response response;
+	request_t request;
+	response_t response;
 	mqd_t client_q;
 	
 	pthread_mutex_lock(&mutex_request);
-	request = (*(Request *)req);
+	request = (*(request_t *)req);
 	request_not_copied = false;
 	pthread_cond_signal(&request_cond);
 	pthread_mutex_unlock(&mutex_request);
@@ -175,7 +175,7 @@ void tratar_peticion(void *req){
 			
 		/* FUNCIONALIDAD GET_VALUE */
 		case GET_VALUE:
-
+			break;
 		/* FUNCIONALIDAD MODIFY_VALUE */
 		case MODIFY_VALUE:
 			response.status = modify_value(request.data.key, request.data.value1, request.data.value2, request.data.value3);
@@ -191,6 +191,8 @@ void tratar_peticion(void *req){
 			response.status = exist(request.data.key);
 			break;
 
+		case COPY_KEY:
+			break;
 			
 	}
 		
@@ -213,12 +215,12 @@ void tratar_peticion(void *req){
 }
 /* Abre la cola del servidor, recibe las peticiones, y espera a que se traten para mandar la respuesta */
 int main(void){
-	Request req;
+	request_t req;
 	pthread_t thid;
 	pthread_attr_t t_attr;
 
 	attr.mq_maxmsg = 10;
-	attr.mq_msgsize = sizeof(Request);
+	attr.mq_msgsize = sizeof(request_t);
 
 
 	server_q = mq_open("/SERVER", O_CREAT|O_RDONLY, 0700, &attr);

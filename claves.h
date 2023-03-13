@@ -6,32 +6,33 @@
 
 enum OP {
 	INIT = 0,
-	SET_VALUE,
-	GET_VALUE,
-	MODIFY_VALUE,
-	DELETE_KEY,
-	EXIST
+	SET_VALUE = 1,
+	GET_VALUE = 2,
+	MODIFY_VALUE = 3,
+	DELETE_KEY = 4,
+	EXIST = 5,
+	COPY_KEY = 6
 }; 
 
 
-typedef struct Tuple{
+typedef struct tuple_t{
 	int key;               // Clave de la tupla
 	char value1[MAX_SIZE]; // Valor 1 
 	int value2; 		   // Valor 2
 	double value3;         // Valor 3  
-} Tuple; 
+} tuple_t; 
 
-typedef struct Request{
+typedef struct request_t{
 	char name[MAX_SIZE];   // Nombre de la cola 
 	int op;                // Codigo de operacion 
-	Tuple data;            // Tupla con los datos 
-} Request; 
+	tuple_t data;            // Tupla con los datos 
+} request_t; 
 
-typedef struct Response{
+typedef struct response_t{
 	int status; 
-	Tuple data; 
+	tuple_t data; 
 
-} Response; 
+} response_t; 
 
 
 int init(void); 
