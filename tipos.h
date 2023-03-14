@@ -1,5 +1,5 @@
-#ifndef _CLAVES_H
-#define _CLAVES_H
+#ifndef _TIPOS_H
+#define _TIPOS_H
 
 
 #define MAX_SIZE 256

@@ -7,40 +7,10 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include "tipos.h"
 
 
 #define MAX_SIZE 256
-
-enum OP {
-	INIT = 0,
-	SET_VALUE = 1,
-	GET_VALUE = 2,
-	MODIFY_VALUE = 3,
-	DELETE_KEY = 4,
-	EXIST = 5,
-	COPY_KEY = 6
-}; 
-
-typedef struct tuple_t{    
-	int key;               // Clave de la tupla
-	char value1[MAX_SIZE]; // Valor 1 
-	int value2; 		   // Valor 2
-	double value3;         // Valor 3  
-} tuple_t; 
-
-typedef struct request_t{
-	char name[MAX_SIZE];   // Nombre de la cola 
-	int op;                // Codigo de operacion 
-	tuple_t data;            // Tupla con los datos 
-} request_t; 
-
-typedef struct response_t{
-	int status; 
-	tuple_t data; 
-
-} response_t; 
-
-
 
 pthread_mutex_t mutex_request;
 int request_not_copied = true;
@@ -217,6 +187,43 @@ int exist(int key){ //Funciona
 	}
 }
 
+int copy_key(int key1, int key2){
+	DIR* dir = opendir("key_db");
+	FILE* keydata;
+	char path1[1024];
+	char full_path1[2048];
+	char path2[1024];
+	char full_path2[2048];
+	char copy_buff[1024];
+	int cond = false;
+	sprintf(path1, "%d.txt", key1);
+	sprintf(path2, "%d.txt", key2);
+	sprintf(full_path1, "key_db/%s", path1);
+	sprintf(full_path2, "key_db/%s", path2);
+	if (dir){
+		struct dirent *entry;
+		while((entry = readdir(dir))!=0){
+			if (strcmp(entry->d_name, path1) != 0){
+				int cond = true;
+			}
+			if (cond == true){
+				keydata = fopen(full_path1, "r");
+				fread(copy_buff, sizeof(copy_buff), 1, keydata);
+				fclose(keydata);
+				keydata = fopen(full_path2, "w");
+				fwrite(copy_buff, sizeof(copy_buff), 1, keydata);
+				fclose(keydata);
+				closedir(dir);
+				return 0;
+			}			
+		}
+		closedir(dir);
+		return -1;
+	}
+	return -1;
+
+}
+
 /* Función llamada para tratar las peticiones recibidas */
 void tratar_peticion(void *req){
 	request_t request;
@@ -260,6 +267,7 @@ void tratar_peticion(void *req){
 			break;
 
 		case COPY_KEY:
+			response.status = copy_key(request.data.key, request.key2);
 			break;
 			
 	}
