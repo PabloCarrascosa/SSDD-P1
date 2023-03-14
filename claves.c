@@ -146,7 +146,7 @@ int get_value(int key, char *value1, int *value2, double *value3)
 		return (-1);
 	}	
 
-	if(res.status){
+	if(res.status == 0){
 		strcpy(value1, res.data.value1); 
 		*value2 = res.data.value2;
 		*value3 = res.data.value3;  
@@ -286,7 +286,6 @@ int exist(int key)
 		return (-1);
 	}
 
-
 	strcpy(req.name, queuename);
 	req.op = EXIST;
 	req.data.key = key; 
@@ -357,6 +356,7 @@ int copy_key(int key1, int key2)
 	}
 
 	req.data.key = key2; 
+	req.op = SET_VALUE; 
 	strcpy(req.data.value1, res.data.value1); 
 	req.data.value2 = res.data.value2; 
 	req.data.value3 = res.data.value3; 
@@ -375,3 +375,4 @@ int copy_key(int key1, int key2)
 	mq_unlink(req.name); 
 	return (res.status);
 }
+

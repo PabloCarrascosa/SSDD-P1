@@ -14,8 +14,7 @@ enum OP {
 	COPY_KEY = 6
 }; 
 
-
-typedef struct tuple_t{
+typedef struct tuple_t{    
 	int key;               // Clave de la tupla
 	char value1[MAX_SIZE]; // Valor 1 
 	int value2; 		   // Valor 2
@@ -31,8 +30,8 @@ typedef struct request_t{
 typedef struct response_t{
 	int status; 
 	tuple_t data; 
-
 } response_t; 
+
 
 
 int init(void); 

@@ -1,4 +1,5 @@
 #include <mqueue.h>
+#include <stdlib.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -6,7 +7,40 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
-#include "claves.h"
+
+
+#define MAX_SIZE 256
+
+enum OP {
+	INIT = 0,
+	SET_VALUE = 1,
+	GET_VALUE = 2,
+	MODIFY_VALUE = 3,
+	DELETE_KEY = 4,
+	EXIST = 5,
+	COPY_KEY = 6
+}; 
+
+typedef struct tuple_t{    
+	int key;               // Clave de la tupla
+	char value1[MAX_SIZE]; // Valor 1 
+	int value2; 		   // Valor 2
+	double value3;         // Valor 3  
+} tuple_t; 
+
+typedef struct request_t{
+	char name[MAX_SIZE];   // Nombre de la cola 
+	int op;                // Codigo de operacion 
+	tuple_t data;            // Tupla con los datos 
+} request_t; 
+
+typedef struct response_t{
+	int status; 
+	tuple_t data; 
+
+} response_t; 
+
+
 
 pthread_mutex_t mutex_request;
 int request_not_copied = true;
@@ -14,7 +48,9 @@ pthread_cond_t request_cond;
 mqd_t server_q;
 struct mq_attr attr;
 
-int init(){
+
+
+int init(){ //Funciona
 	DIR* dir = opendir("key_db");
 	if (dir){
 		struct dirent *entry;
@@ -36,7 +72,7 @@ int init(){
 		return 0;
 }
 
-int set_value(int key, char *value1, int value2, double value3){
+int set_value(int key, char *value1, int value2, double value3){ //Funciona
 	DIR* dir = opendir("key_db");
 	FILE* keydata;
 	char path[1024];
@@ -53,7 +89,7 @@ int set_value(int key, char *value1, int value2, double value3){
 			}
 		}
 		keydata = fopen(full_path, "w");
-		fprintf(keydata, "%d;%s;%d;%f",
+		fprintf(keydata, "%d;%s;%d;%f;",
 		key, 
 		value1, 
 		value2, 
@@ -69,11 +105,41 @@ int set_value(int key, char *value1, int value2, double value3){
 		return -1;
 	}
 }
-/*
-int get_value(int key, char *value1, int *value2, double *value3){
 
+int get_value(int key, char *value1, int *value2, double *value3) 
+{
+	DIR* dir = opendir("key_db");
+	FILE* keydata;
+	char path[1024];
+	char full_path[2048];
+
+	sprintf(path, "%d.txt", key);
+	sprintf(full_path, "key_db/%s", path);
+
+	if(!dir) return (-1); // Si no existe el directorio se devuelve -1 y la ejecucion acaba
+
+	struct dirent *entry;
+	while((entry = readdir(dir)) != 0){
+		if (strcmp(entry->d_name, path) == 0){
+			keydata = fopen(full_path, "r");
+			
+		
+			fscanf(keydata, "%*d;%[^;];%d;%lf;", value1, value2, value3); 
+
+			if (fclose(keydata) < 0){
+				closedir(dir);
+				return (-1);
+			}
+			closedir(dir);
+			return (0);
+		}
+	}
+
+	closedir(dir);
+	return (-1);
 }
-*/
+
+
 int modify_value(int key, char *value1, int value2, double value3){
 	DIR* dir = opendir("key_db");
 	FILE* keydata;
@@ -107,7 +173,7 @@ int modify_value(int key, char *value1, int value2, double value3){
 	}
 }
 
-int delete_key(int key){
+int delete_key(int key){ // Funciona
 	DIR* dir = opendir("key_db");
 	char path[1024];
 	char full_path[2048];
@@ -130,7 +196,8 @@ int delete_key(int key){
 		return -1;
 	}
 }
-int exist(int key){
+
+int exist(int key){ //Funciona
 	DIR* dir = opendir("key_db");
 	char path[1024];
 	sprintf(path, "%d.txt", key);
@@ -143,7 +210,7 @@ int exist(int key){
 			}
 		}
 		closedir(dir);
-		return -1;
+		return 0; //Cuando no encuentra devuelve 0 (antes ponia -1)
 	}
 	else{
 		return -1;
@@ -175,6 +242,7 @@ void tratar_peticion(void *req){
 			
 		/* FUNCIONALIDAD GET_VALUE */
 		case GET_VALUE:
+			response.status = get_value(request.data.key, response.data.value1, &response.data.value2, &response.data.value3); 
 			break;
 		/* FUNCIONALIDAD MODIFY_VALUE */
 		case MODIFY_VALUE:
@@ -215,6 +283,7 @@ void tratar_peticion(void *req){
 }
 /* Abre la cola del servidor, recibe las peticiones, y espera a que se traten para mandar la respuesta */
 int main(void){
+
 	request_t req;
 	pthread_t thid;
 	pthread_attr_t t_attr;
@@ -234,10 +303,12 @@ int main(void){
 	pthread_attr_init(&t_attr);
 
 	pthread_attr_setdetachstate(&t_attr, PTHREAD_CREATE_DETACHED);
-
+	return(0); 
 	while(1){
+
 		if (mq_receive(server_q, (char *) &req, sizeof(req), 0) < 0){
 			printf("Error recieving the request");
+			fflush(stdout); 
 			return -1;
 		}
 		if (pthread_create(&thid, &t_attr, (void *)tratar_peticion, (void*)&req)== 0){
