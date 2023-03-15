@@ -19,6 +19,20 @@ mqd_t server_q;
 struct mq_attr attr;
 
 
+int exist(int key){ //Funciona
+	char full_path[2048];
+	sprintf(full_path, "key_db/%d.txt", key);
+	FILE *keydata;
+	keydata = fopen(full_path, "r");
+	if (keydata == NULL){
+		return 0;
+	}
+	else{
+		fclose(keydata);
+		return 1;
+	}
+}
+
 
 int init(){ //Funciona
 	DIR* dir = opendir("key_db");
@@ -42,187 +56,98 @@ int init(){ //Funciona
 		return 0;
 }
 
-int set_value(int key, char *value1, int value2, double value3){ //Funciona
-	DIR* dir = opendir("key_db");
-	FILE* keydata;
-	char path[1024];
-	char full_path[2048];
-	sprintf(path,"%d.txt", key);
-	sprintf(full_path, "key_db/%s", path);
 
-	if (dir){
-		struct dirent *entry;
-		while((entry = readdir(dir))!= 0){
-			if (strcmp(entry->d_name, path) == 0){
-				closedir(dir);
-				return -1;
-			}
-		}
-		keydata = fopen(full_path, "w");
-		fprintf(keydata, "%d;%s;%d;%f;",
-		key, 
-		value1, 
-		value2, 
-		value3);
-		if (fclose(keydata) < 0){
-			closedir(dir);
-			return -1;
-		}
-		closedir(dir);
-		return 0;
-	}
-	else{
+int set_value(int key, char *value1, int value2, double value3){ //Funciona
+	char full_path[2048];
+	sprintf(full_path, "key_db/%d.txt", key);
+	FILE *keydata;
+	if (exist(key)){
 		return -1;
 	}
-}
+	else{
+		keydata = fopen(full_path, "w");
+		fprintf(keydata, "%d;%s;%d;%f;",key, value1, value2, value3);
+		fclose(keydata);
+		return 0;
+	}
+}	
+
 
 int get_value(int key, char *value1, int *value2, double *value3) 
 {
-	DIR* dir = opendir("key_db");
-	FILE* keydata;
-	char path[1024];
 	char full_path[2048];
-
-	sprintf(path, "%d.txt", key);
-	sprintf(full_path, "key_db/%s", path);
-
-	if(!dir) return (-1); // Si no existe el directorio se devuelve -1 y la ejecucion acaba
-
-	struct dirent *entry;
-	while((entry = readdir(dir)) != 0){
-		if (strcmp(entry->d_name, path) == 0){
-			keydata = fopen(full_path, "r");
-			
-		
-			fscanf(keydata, "%*d;%[^;];%d;%lf;", value1, value2, value3); 
-
-			if (fclose(keydata) < 0){
-				closedir(dir);
-				return (-1);
-			}
-			closedir(dir);
-			return (0);
-		}
+	sprintf(full_path, "key_db/%d.txt", key);
+	FILE *keydata;
+	if (!exist(key)){
+		return -1;
 	}
-
-	closedir(dir);
-	return (-1);
+	else{
+		keydata = fopen(full_path, "r");
+		fscanf(keydata, "%*d;%[^;];%d;%lf;", value1, value2, value3); 
+		fclose(keydata);
+		return 0;
+	}
 }
 
 
 int modify_value(int key, char *value1, int value2, double value3){
-	DIR* dir = opendir("key_db");
-	FILE* keydata;
-	char path[1024];
 	char full_path[2048];
-	sprintf(path, "%d.txt", key);
-	sprintf(full_path, "key_db/%s", path);
-	if (dir){
-		struct dirent *entry;
-		while((entry = readdir(dir))!= 0){
-			if (strcmp(entry->d_name, path) == 0){
-				keydata = fopen(full_path, "w");
-				fprintf(keydata, "%d;%s;%d;%f",
-				key, 
-				value1, 
-				value2, 
-				value3);
-				if (fclose(keydata) < 0){
-					closedir(dir);
-					return -1;
-				}
-				closedir(dir);
-				return 0;
-			}
-		}
-		closedir(dir);
+	sprintf(full_path, "key_db/%d.txt", key);
+	FILE *keydata;
+	if (!exist(key)){
 		return -1;
 	}
 	else{
-		return -1;
+		keydata = fopen(full_path, "w");
+		fprintf(keydata, "%d;%s;%d;%f",key, value1, value2, value3);
+		fclose(keydata);
+		return 0;
 	}
 }
+
 
 int delete_key(int key){ // Funciona
-	DIR* dir = opendir("key_db");
-	char path[1024];
 	char full_path[2048];
-	sprintf(path, "%d.txt", key);
-	sprintf(full_path, "key_db/%s", path);
-	if (dir){
-		struct dirent *entry;
-		while((entry = readdir(dir))!= 0){
-			if (strcmp(entry->d_name, path) == 0){
-				
-				unlink(full_path);
-				closedir(dir);
-				return 0;
-			}
-		}
-		closedir(dir);
+	sprintf(full_path, "key_db/%d.txt", key);
+	if (!exist(key)){
 		return -1;
 	}
 	else{
-		return -1;
+		unlink(full_path);
+		return 0;
 	}
 }
 
-int exist(int key){ //Funciona
-	DIR* dir = opendir("key_db");
-	char path[1024];
-	sprintf(path, "%d.txt", key);
-	if (dir){
-		struct dirent *entry;
-		while((entry = readdir(dir))!= 0){
-			if (strcmp(entry->d_name, path) == 0){
-				closedir(dir);
-				return 1;
-			}
+
+int copy_key(int key1, int key2) {
+    char path1[1024], path2[1024];
+    char full_path1[2048], full_path2[2048];
+    char copy_buff[1024];
+    FILE* keydata1;
+    FILE* keydata2;
+
+
+    sprintf(path1, "%d.txt", key1);
+    sprintf(path2, "%d.txt", key2);
+    sprintf(full_path1, "key_db/%s", path1);
+    sprintf(full_path2, "key_db/%s", path2);
+
+    if (!exist(key1)) {
+        return -1;
+    }
+	else{	
+		keydata1 = fopen(full_path1, "r");
+		keydata2 = fopen(full_path2, "w");
+		while (fread(copy_buff, sizeof(char), sizeof(copy_buff), keydata1) > 0) {
+			fwrite(copy_buff, sizeof(char), sizeof(copy_buff), keydata2);
 		}
-		closedir(dir);
-		return 0; //Cuando no encuentra devuelve 0 (antes ponia -1)
+		fclose(keydata1);
+		fclose(keydata2);
+		return 0;
 	}
-	else{
-		return -1;
-	}
-}
-
-int copy_key(int key1, int key2){
-	DIR* dir = opendir("key_db");
-	FILE* keydata;
-	char path1[1024];
-	char full_path1[2048];
-	char path2[1024];
-	char full_path2[2048];
-	char copy_buff[1024];
-	int cond = false;
-	sprintf(path1, "%d.txt", key1);
-	sprintf(path2, "%d.txt", key2);
-	sprintf(full_path1, "key_db/%s", path1);
-	sprintf(full_path2, "key_db/%s", path2);
-	if (dir){
-		struct dirent *entry;
-		while((entry = readdir(dir))!=0){
-			if (strcmp(entry->d_name, path1) != 0){
-				int cond = true;
-			}
-			if (cond == true){
-				keydata = fopen(full_path1, "r");
-				fread(copy_buff, sizeof(copy_buff), 1, keydata);
-				fclose(keydata);
-				keydata = fopen(full_path2, "w");
-				fwrite(copy_buff, sizeof(copy_buff), 1, keydata);
-				fclose(keydata);
-				closedir(dir);
-				return 0;
-			}			
-		}
-		closedir(dir);
-		return -1;
-	}
-	return -1;
 
 }
+
 
 /* Función llamada para tratar las peticiones recibidas */
 void tratar_peticion(void *req){
@@ -289,8 +214,11 @@ void tratar_peticion(void *req){
 	pthread_exit(0);
 
 }
+
+
 /* Abre la cola del servidor, recibe las peticiones, y espera a que se traten para mandar la respuesta */
 int main(void){
+
 
 	request_t req;
 	pthread_t thid;
@@ -311,7 +239,6 @@ int main(void){
 	pthread_attr_init(&t_attr);
 
 	pthread_attr_setdetachstate(&t_attr, PTHREAD_CREATE_DETACHED);
-	return(0); 
 	while(1){
 
 		if (mq_receive(server_q, (char *) &req, sizeof(req), 0) < 0){

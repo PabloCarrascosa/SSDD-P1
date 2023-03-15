@@ -334,32 +334,9 @@ int copy_key(int key1, int key2)
 		return (-1);
 	}
 
-
-	strcpy(req.name, queuename);
-	req.op = GET_VALUE;
-	req.data.key = key1; 
-
-	if (mq_send(q_server, (const char *) &req, sizeof(req), 0) < 0){
-		perror("mq_send");
-		return (-1);
-	}	
-    if (mq_receive(q_client, (char *) &res, sizeof(response_t), 0) < 0){
-		perror("mq_recv");
-		return (-1);
-	}	
-
-	if(!res.status){
-		mq_close(q_server); 
-		mq_close(q_client);
-		mq_unlink(req.name); 
-		return (res.status);
-	}
-
-	req.data.key = key2; 
-	req.op = SET_VALUE; 
-	strcpy(req.data.value1, res.data.value1); 
-	req.data.value2 = res.data.value2; 
-	req.data.value3 = res.data.value3; 
+	req.data.key = key1;
+	req.key2 = key2; 
+	req.op = COPY_KEY; 
 
 	if (mq_send(q_server, (const char *) &req, sizeof(req), 0) < 0){
 		perror("mq_send");
@@ -369,6 +346,7 @@ int copy_key(int key1, int key2)
 		perror("mq_recv");
 		return (-1);
 	}	
+
 
 	mq_close(q_server); 
 	mq_close(q_client);

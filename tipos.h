@@ -6,12 +6,12 @@
 
 enum OP {
 	INIT = 0,
-	SET_VALUE = 1,
-	GET_VALUE = 2,
-	MODIFY_VALUE = 3,
-	DELETE_KEY = 4,
-	EXIST = 5,
-	COPY_KEY = 6
+	SET_VALUE,
+	GET_VALUE,
+	MODIFY_VALUE,
+	DELETE_KEY,
+	EXIST,
+	COPY_KEY
 }; 
 
 typedef struct tuple_t{    
@@ -24,24 +24,14 @@ typedef struct tuple_t{
 typedef struct request_t{
 	char name[MAX_SIZE];   // Nombre de la cola 
 	int op;                // Codigo de operacion 
-	tuple_t data;            // Tupla con los datos 
-	int key2;
+	tuple_t data;          // Tupla con los datos 
+	int key2;			   // Segunda key opcional, usada solo para el copy 
 } request_t; 
 
 typedef struct response_t{
 	int status; 
 	tuple_t data; 
 } response_t; 
-
-
-
-int init(void); 
-int set_value(int key, char *value1, int value2, double value3); 
-int get_value(int key, char *value1, int *value2, double *value3); 
-int modify_value(int key, char *value1, int value2, double value3); 
-int delete_key(int key); 
-int exist(int key); 
-int copy_key(int key1, int key2); 
 
 #endif
 

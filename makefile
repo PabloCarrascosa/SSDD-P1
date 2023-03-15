@@ -6,9 +6,8 @@ SRCFILES := cliente.c servidor.c
 OBJFILES := $(SRCFILES:%.c=%.o)
 
 
-
 LDFLAGS= -L.
-CFLAGS := -Wall -I. 
+CFLAGS := -Wall -Wextra -Werror -I. 
 LDLIBS := -lpthread -lrt
 
 all: $(BINFILES)
@@ -27,7 +26,7 @@ libclaves.so: claves.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 clean: 
-	rm -f $(OBJFILES)
+	rm -f $(OBJFILES)  claves.o
 
 fclean: clean
 	rm -f $(BINFILES) libclaves.so
