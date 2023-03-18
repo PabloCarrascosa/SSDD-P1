@@ -9,6 +9,7 @@
 
 int main(void) {
 
+
 	char value1[256];
 	int value2 = 2;
 	double value3 = 2.34;
@@ -46,7 +47,7 @@ int main(void) {
     printf("\n/***************GET*************/\n");
     int get_res; 
     get_res = get_value(1, value1_get, &value2_get, &value3_get);
-	printf("GET 100 (RESULTADO ESPERADO 0) \n  Codigo error: %d \n  Value1: %s \n  Value2: %d \n  Value3: %lf \n", get_res, value1_get, value2_get,value3_get);
+	printf("GET 1 (RESULTADO ESPERADO 0) \n  Codigo error: %d \n  Value1: %s \n  Value2: %d \n  Value3: %lf \n", get_res, value1_get, value2_get,value3_get);
 	strcpy(value1_get, "");
 	value2_get = 0; 
 	value3_get = 0.0; 
@@ -109,5 +110,7 @@ int main(void) {
 	printf("GET 1 (resultado esperado 0 y contenido igual al 320) \n  Codigo error: %d \n  Value1: %s \n  Value2: %d \n  Value3: %lf \n", get_res, value1_get, value2_get,value3_get);
 	copy_res = copy_key(33209, 2020); 
 	printf("Resultado copy 33209 a 2020 (resultado esperado -1): %d \n", copy_res);
+
+
 }
 

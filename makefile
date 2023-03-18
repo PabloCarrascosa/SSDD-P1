@@ -19,7 +19,7 @@ cliente: cliente.o libclaves.so
 	$(CC) -o $@ cliente.c $(LDFLAGS) $(CFLAGS) -Bdynamic -lclaves $(LDLIBS)
 
 libclaves.so: claves.c
-	$(CC) -fPIC -c -o claves.o claves.c
+	$(CC) -fPIC $(CFLAGS) -c -o claves.o claves.c
 	$(CC) -shared claves.o -o libclaves.so 
 
 %.o: %.c
